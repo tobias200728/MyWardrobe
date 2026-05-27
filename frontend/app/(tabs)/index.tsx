@@ -1,98 +1,153 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import React, { useState, useCallback } from 'react';
+import {
+  View,
+  Text,
+  ScrollView,
+  StyleSheet,
+  StatusBar,
+  SafeAreaView,
+} from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Colors, FontSize, FontWeight, Spacing, BorderRadius } from '@/constants/theme';
+import { CategoryChip } from '@/components/CategoryChip';
+import { EmptyState } from '@/components/EmptyState';
+import { OutfitCard } from '@/components/OutfitCard';
+import { FAB } from '@/components/FAB';
+import { AddOutfitModal } from '@/components/AddOutfitModal';
+import type { Outfit, OutfitCategory } from '@/constants/types';
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+const CATEGORIES: OutfitCategory[] = ['Alle', 'Casual', 'Business', 'Sport'];
 
 export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+  const [selectedCategory, setSelectedCategory] = useState<OutfitCategory>('Alle');
+  const [outfits, setOutfits] = useState<Outfit[]>([]);
+  const [showAddModal, setShowAddModal] = useState(false);
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+  const filteredOutfits = selectedCategory === 'Alle'
+    ? outfits
+    : outfits.filter((o) => o.category === selectedCategory);
+
+  const handleAddOutfit = useCallback((newOutfit: Omit<Outfit, 'id' | 'createdAt'>) => {
+    const outfit: Outfit = {
+      ...newOutfit,
+      id: Date.now().toString(),
+      createdAt: Date.now(),
+    };
+    setOutfits((prev) => [outfit, ...prev]);
+  }, []);
+
+  return (
+    <View style={styles.screen}>
+      <StatusBar barStyle="dark-content" />
+      <LinearGradient
+        colors={[Colors.backgroundGradientStart, Colors.backgroundGradientEnd]}
+        style={styles.backgroundGradient}
+      />
+      <SafeAreaView style={styles.safeArea}>
+        {/* Header */}
+        <View style={styles.header}>
+          <Text style={styles.title}>Meine Outfits</Text>
+          <Ionicons name="heart-outline" size={28} color={Colors.heartColor} />
+        </View>
+
+        {/* Category filters */}
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.chipContainer}
+          style={styles.chipScroll}
+        >
+          {CATEGORIES.map((cat) => (
+            <CategoryChip
+              key={cat}
+              label={cat}
+              isSelected={selectedCategory === cat}
+              onPress={() => setSelectedCategory(cat)}
+            />
+          ))}
+        </ScrollView>
+
+        {/* Content */}
+        {filteredOutfits.length === 0 ? (
+          <View style={styles.emptyContainer}>
+            <EmptyState />
+          </View>
+        ) : (
+          <ScrollView
+            contentContainerStyle={styles.outfitGrid}
+            showsVerticalScrollIndicator={false}
+          >
+            <View style={styles.gridRow}>
+              {filteredOutfits.map((outfit) => (
+                <OutfitCard key={outfit.id} outfit={outfit} />
+              ))}
+            </View>
+          </ScrollView>
+        )}
+      </SafeAreaView>
+
+      {/* FAB */}
+      <FAB onPress={() => setShowAddModal(true)} />
+
+      {/* Add Outfit Modal */}
+      <AddOutfitModal
+        visible={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        onAdd={handleAddOutfit}
+      />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  screen: {
+    flex: 1,
+    backgroundColor: Colors.backgroundGradientEnd,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
+  backgroundGradient: {
     position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+  },
+  safeArea: {
+    flex: 1,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: Spacing.lg,
+    paddingTop: Spacing.md,
+    paddingBottom: Spacing.sm,
+  },
+  title: {
+    fontSize: FontSize.title,
+    fontWeight: FontWeight.extrabold,
+    color: Colors.primary,
+  },
+  chipContainer: {
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.md,
+  },
+  chipScroll: {
+    flexGrow: 0,
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  outfitGrid: {
+    paddingHorizontal: Spacing.lg,
+    paddingTop: Spacing.md,
+    paddingBottom: 100,
+  },
+  gridRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
   },
 });

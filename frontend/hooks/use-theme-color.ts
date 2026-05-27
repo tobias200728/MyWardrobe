@@ -1,21 +1,26 @@
 /**
- * Learn more about light and dark modes:
- * https://docs.expo.dev/guides/color-schemes/
+ * Simplified theme color hook for MyWardrobe app.
+ * Since the app uses a single pink color scheme, this just returns the appropriate color.
  */
 
 import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+
+const colorMap: Record<string, string> = {
+  text: Colors.textPrimary,
+  background: Colors.backgroundGradientEnd,
+  tint: Colors.primary,
+  icon: Colors.textSecondary,
+};
 
 export function useThemeColor(
   props: { light?: string; dark?: string },
-  colorName: keyof typeof Colors.light & keyof typeof Colors.dark
+  colorName: string
 ) {
-  const theme = useColorScheme() ?? 'light';
-  const colorFromProps = props[theme];
+  const colorFromProps = props.light;
 
   if (colorFromProps) {
     return colorFromProps;
   } else {
-    return Colors[theme][colorName];
+    return colorMap[colorName] || Colors.textPrimary;
   }
 }
