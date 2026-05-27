@@ -164,7 +164,7 @@ export function AddOutfitModal({ visible, onClose, onAdd }: AddOutfitModalProps)
                     end={{ x: 1, y: 0 }}
                     style={styles.fileButtonGradient}
                   >
-                    <Text style={styles.fileButtonText}>Datei auswählen</Text>
+                    <Text style={styles.fileButtonText}>Foto auswählen</Text>
                   </LinearGradient>
                 </TouchableOpacity>
                 <Text style={styles.fileNameText} numberOfLines={1}>

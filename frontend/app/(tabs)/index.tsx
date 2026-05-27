@@ -5,7 +5,6 @@ import {
   ScrollView,
   StyleSheet,
   StatusBar,
-  SafeAreaView,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -16,6 +15,7 @@ import { OutfitCard } from '@/components/OutfitCard';
 import { FAB } from '@/components/FAB';
 import { AddOutfitModal } from '@/components/AddOutfitModal';
 import type { Outfit, OutfitCategory } from '@/constants/types';
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const CATEGORIES: OutfitCategory[] = ['Alle', 'Casual', 'Business', 'Sport'];
 
