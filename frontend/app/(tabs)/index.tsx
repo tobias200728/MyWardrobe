@@ -6,7 +6,7 @@ import {
   StyleSheet,
   StatusBar,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Colors, FontSize, FontWeight, Spacing, BorderRadius } from '@/constants/theme';
 import { CategoryChip } from '@/components/CategoryChip';
@@ -48,7 +48,7 @@ export default function HomeScreen() {
         {/* Header */}
         <View style={styles.header}>
           <Text style={styles.title}>Meine Outfits</Text>
-          <Ionicons name="heart-outline" size={28} color={Colors.heartColor} />
+          <MaterialCommunityIcons name="hanger" size={28} color={Colors.heartColor} />
         </View>
 
         {/* Category filters */}
