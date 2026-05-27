@@ -6,4 +6,4 @@
 //   2. Settings → Access Tokens → "New token" (Read-Rechte reichen)
 //   3. Token hier eintragen:
 // ─────────────────────────────────────────────────────────────────────────────
-export const HUGGINGFACE_TOKEN = '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';   // ← hf_xxx... hier eintragen
+export const HUGGINGFACE_TOKEN = '';   // ← hf_xxx... hier eintragen
